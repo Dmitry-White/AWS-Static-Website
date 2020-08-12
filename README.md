@@ -40,3 +40,35 @@ This will enable CloudFront static website hosting in Edge Locations with user-f
 ## CloudFormation deployment
 
 https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/getting-started-secure-static-website-cloudformation-template.html
+
+### Prerequsite Part
+
+1. Install zip
+   https://sourceforge.net/projects/gnuwin32/files/zip/3.0/zip-3.0-setup.exe/download?use_mirror=kumisystems
+2. Install make
+   https://sourceforge.net/projects/gnuwin32/files/make/3.81/make-3.81.exe/download?use_mirror=jztkft&download=
+3. Run `make package-function`
+4. Create artifacts bucket
+   `aws s3 mb s3://example-bucket-for-artifacts --region us-east-1`
+5. Create `domain-name` Hosted Zone
+
+### Package Part
+
+```
+aws cloudformation package \
+    --region us-east-1
+    --template-file templates/main.yaml \
+    --s3-bucket example-bucket-for-artifacts \
+    --output-template-file packaged.template
+```
+
+### Deployment Part
+
+```
+aws cloudformation deploy \
+    --region us-east-1
+    --stack-name your-CloudFormation-stack-name \
+    --template-file packaged.template \
+    --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
+    --parameter-overrides DomainName=example.com SubDomain=www
+```
